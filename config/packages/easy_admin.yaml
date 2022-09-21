@@ -1,0 +1,145 @@
+easy_admin:
+    site_name: 'Wall of names - Admin'
+    user:
+      name_property_path: 'email'
+      display_name: true
+      display_avatar: true
+    list:
+      item_permission: 'ROLE_ADMIN'
+      max_results: 50
+    show:
+      item_permission: 'ROLE_ADMIN'
+    edit:
+      item_permission: 'ROLE_ADMIN'
+    new:
+      item_permission: 'ROLE_ADMIN'
+    formats:
+      date:     'd/m/Y'
+      time:     'H:i'
+      datetime: 'd/m/Y H:i:s'
+
+    design:
+      menu:
+        - { entity: 'Name' }
+        - { entity: 'Order' }
+        - { entity: 'TextFont' }
+        - { entity: 'Size' }
+        - { entity: 'Delay' }
+        - { entity: 'Grade' }
+        - { entity: 'PaymentMethod' }
+        - { entity: 'DiscountCode' }
+        - { entity: 'Contact' }
+
+        - { label: 'Validate names', route: 'validate_names' }
+        - { label: 'Access to the frontend', route: 'index' }
+
+
+    entities:
+      Name:
+        disabled_actions: ['edit','new','delete']
+        class: App\Entity\Name
+        list:
+          sort: 'id'
+          fields: 
+            - id
+            - name
+            - { property: 'urlEnabled', type: 'boolean' }
+            - addedDate
+            - color
+            - positionX
+            - positionY
+            - width
+            - height
+            - { property: 'bold', type: 'boolean' }
+            - { property: 'italic', type: 'boolean' }
+            - { property: 'confirmation', type: 'boolean' }
+            - confirmationDate
+            - { property: 'validation', type: 'boolean' }
+            - { property: 'deletion', type: 'boolean' }
+            - deletionDate
+            - size
+            - textFont
+            - delay
+            - grade
+            - order
+      Order:
+        disabled_actions: ['edit', 'new','delete']
+        class: App\Entity\Order
+        list:
+          sort: 'id'
+          fields: 
+            - id
+            - buyerName
+            - { property: 'buyerEmail', type: 'email' }
+            - ip
+            - price
+            - priceBeforeDiscount
+            - currency
+            - orderNumber
+            - { property: 'paid', type: 'boolean' }
+            - language
+            - paymentMethod
+            - discountCode
+            - receipt
+            - paymentId
+            - payPalCaptureId
+            - payPalRefundId
+            - mailPayPalSent
+            - refundReason
+      TextFont:
+        disabled_actions: ['delete']
+        class: App\Entity\TextFont
+        list:
+          fields: 
+            - id
+            - textFont
+            - price
+            - textFontFile
+            - extension
+            - { property: 'boldAvailable', type: 'boolean' }
+            - { property: 'italicAvailable', type: 'boolean' }
+        new:
+          fields:
+            - { property: "textFont", type: "text" }
+            - { property: "textFontFile", type: "text" }
+            - { property: "fileBase", type: "file", type_options: {required: true } }
+            - boldAvailable
+            - { property: "fileBold", type: "file" }
+            - italicAvailable
+            - { property: "fileItalic", type: "file" }
+            - { property: "fileBI", type: "file", label: "file bold and italic"}
+            - price
+      Size:
+        disabled_actions: ['delete']
+        class: App\Entity\Size
+      Delay:
+        disabled_actions: ['delete']
+        class: App\Entity\Delay
+        list:
+          fields: 
+            - id
+            - price
+            - nbDays
+      Grade:
+        disabled_actions: ['delete']
+        class: App\Entity\Grade
+      DiscountCode:
+        disabled_actions: ['delete']
+        class: App\Entity\DiscountCode
+      PaymentMethod:
+        disabled_actions: ['edit','delete']
+        class: App\Entity\PaymentMethod
+      Contact:
+        disabled_actions: ['edit', 'new', 'delete']
+        class: App\Entity\Contact
+        list:
+          fields: 
+            - id
+            - name
+            - { property: 'email', type: 'email' }
+            - subject
+            - message
+            - contactDate
+    
+
+

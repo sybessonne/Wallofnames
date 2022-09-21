@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block language %}
+    lang="{{ app.request.getLocale() }}"
+{% endblock %}
+
+{% block stylesheets %}
+    {% set title = webSiteName ~ " - " ~ 'general.displayYourName' | trans %}
+    {% set description = 'meta.meta1' | trans({'%webSiteName%': webSiteName}) %}
+
+    <link rel="stylesheet" href="style/textFonts1.css" type="text/css">
+    <link rel="stylesheet" href="style/mediaQueries.css" type="text/css">
+
+    <title>{{ title }}</title>
+
+    <meta name="Description" content="{{ description }}">
+
+    <meta property="og:title" content="{{ title }}"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="{{ url('index') }}"/>
+    <meta property="og:image" content="{{url('index')~bannerPath }}"/>
+    <meta property="og:site_name" content="{{ webSiteName }}"/>
+    <meta property="og:description" content="{{ description }}"/>
+{% endblock %}
+
+{% block nav %}
+    {% include 'navBar1.html.twig' %}
+{% endblock %}
+
+{% block main %}
+    <article>
+        <div id="containerNamesAll" class="containerNamesAll">
+            <div id="containerNames" class="containerNames">
+                <img id="imageName" class="img-fluid" src="images/wall_v.jpg" width="{{ imageWidth }}" height="{{ imageHeight }}" alt="{{ 'index.imageName' | trans }}"/>
+                <div id="names">
+                    {% include 'names.html.twig' with names %}
+                </div>
+            </div>
+        </div>
+    </article>
+{% endblock %}
+
+{% block footer %}
+    {% include 'footer.html.twig' %}
+{% endblock %}
+
+{% block javascripts %}
+    <script nonce="{{ csp_nonce('script') }}">
+        {% include 'javascript/index.js.twig' %}
+    </script>
+{% endblock %}

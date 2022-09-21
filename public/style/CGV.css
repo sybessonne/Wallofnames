@@ -1,0 +1,14 @@
+body
+{
+	background-image: none;
+	background-color: white;
+	background-repeat: no-repeat;
+	height: 100%; 
+}
+
+main
+{
+	margin: 2% 10%;
+	text-align: justify;
+	text-justify: inter-word;
+}

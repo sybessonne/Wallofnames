@@ -1,0 +1,14 @@
+framework:
+    default_locale: "%webSite.defaultLanguage%"
+    translator:
+        paths:
+            - '%kernel.project_dir%/translations'
+            - '%kernel.project_dir%/translations/CGU'
+            - '%kernel.project_dir%/translations/CGV'
+            - '%kernel.project_dir%/translations/Index'
+            - '%kernel.project_dir%/translations/Edition'
+            - '%kernel.project_dir%/translations/Footer'
+            - '%kernel.project_dir%/translations/Contact'
+            - '%kernel.project_dir%/translations/Javascript'
+        fallbacks:
+            - "%webSite.defaultLanguage%"

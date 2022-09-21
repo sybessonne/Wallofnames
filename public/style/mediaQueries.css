@@ -1,0 +1,126 @@
+@media(min-width:2200px){
+  #backgroundVideo
+  {
+    width: 100vw; 
+    max-width: 50%;
+    height: 43vw;  
+  }
+}
+
+@media(min-width:3000px){
+  #backgroundVideo
+  {
+    width: 100vw; 
+    max-width: 50%;
+   height: 32vw;  
+  }
+}
+
+@media(min-width:4500px){
+  #backgroundVideo
+  {
+    width: 100vw; 
+    max-width: 50%;
+   height: 25vw;  
+  }
+}
+
+
+
+@media (max-width:900px) {
+   .card
+  {
+    width:95%;
+  }
+}
+
+@media (max-width:768px) {
+  .row
+  {
+    flex-wrap: wrap;
+  }
+  
+  .col-6
+  {
+    flex:0 0 100%;
+    max-width: 100%;
+  }
+
+  .col-12
+  {
+    flex:0 0 100%;
+    max-width: 100%;
+  }
+
+  #creation
+  {
+    margin-bottom: 3%;
+  }
+
+  #delays
+  {
+    max-width: 50%;
+  }
+}
+
+@media (max-width:700px) {
+
+  .part
+  {
+    margin-left:0;
+    margin-right:0;
+  }
+
+  .p-5
+  {
+    padding:0 !important;
+  }
+
+  .card
+  {
+    width:95%;
+  }
+
+  #billingInformation
+  {
+    width:95%;
+  }
+
+  #buttonPart1, #buttonPart2, #buttonPart3
+  {
+    padding: 0rem;
+  }
+
+  #paypal-button-container
+  {
+    width:auto;
+  }
+}
+
+@media (max-width:500px) {  
+  .col-7
+  {
+    flex:0 0 100%;
+    max-width: 100%;
+  }
+
+  .col-4
+  {
+    flex:0 0 100%;
+    max-width: 100%;
+  }
+  
+  #secondLine
+  {
+    display:block!important;
+  }
+
+  #sizesDiv, #textFontDiv
+  {
+    margin-bottom: 2%;
+  }
+  #delays
+  {
+    max-width: 95%;
+  }
+}

@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block language %}
+    lang="{{ app.request.getLocale() }}"
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="/style/error1.css" type="text/css">
+    <title>{{ 'error.error'  | trans }}{{" - " ~ status_code }}</title>
+{% endblock %}
+
+{% block nav %}
+    {% include 'navBar2.html.twig' %}
+{% endblock %}
+
+{% block main %}
+    <div class="card grey lighten-1">
+        <div class="card-body">
+            <p id="titleError" class="text-center font-weight-bold">{{ status_code }}</p>
+            <p id="notFound" class="font-weight-bold">{{ 'error.impossible'  | trans }}</p>
+            <a class="btn btn-primary" href="{{ path('index') }}" role="button">{{ 'error.returnIndex'  | trans }}</a>
+        </div>
+    </div>
+{% endblock %}

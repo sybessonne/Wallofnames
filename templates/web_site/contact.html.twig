@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block language %}
+    lang="{{ app.request.getLocale() }}"
+{% endblock %}
+
+{% block stylesheets %}
+    {% set title = webSiteName ~ " - " ~ 'contact.title' | trans %}
+    {% set description = 'meta.meta3' | trans({'%webSiteName%': webSiteName}) %}
+
+    <link rel="stylesheet" href="style/contact1.css" type="text/css">
+    <title>{{ title }}</title>
+
+    <meta name="Description" content="{{ description }}">
+
+    <meta property="og:title" content="{{ title }}"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="{{ url('contact') }}"/>
+    <meta property="og:image" content="{{url('index')~bannerPath }}"/>
+    <meta property="og:site_name" content="{{ webSiteName }}"/>
+    <meta property="og:description" content="{{ description }}"/>
+{% endblock %}
+
+{% block nav %}
+    {% include 'navBar1.html.twig' %}
+{% endblock %}
+
+{% block main %}
+    <div class="card grey lighten-1">
+        <h1 class="card-header h1-responsive text-center">{{ 'contact.contactForm' | trans }}</h1>
+        {{ form_start(form, {'attr': {'id': 'contactForm'}}) }}
+            <div class="md-form form-lg">
+                {{ form_widget(form.name, {'attr': {'class': 'form-control form-control-lg'}}) }}
+                {{ form_label(form.name, 'contact.name' | trans ) }}
+            </div>
+            <div class="md-form form-lg">
+                {{ form_widget(form.email, {'attr': {'class': 'form-control form-control-lg validate'}}) }}
+                {{ form_label(form.email, 'contact.email' | trans, {'label_attr': {'data-error': 'contact.incorrect' | trans, 'data-success': 'contact.correct' | trans }} ) }}
+            </div>
+            <div class="md-form form-lg">
+                {{ form_widget(form.subject, {'attr': {'class': 'form-control form-control-lg'}}) }}
+                {{ form_label(form.subject, 'contact.subject' | trans ) }}
+            </div>
+            <div id="textAreaField" class="md-form form-lg">
+                {{ form_widget(form.message, {'attr': {'class': 'form-control md-textarea', 'rows': '8', 'maxlength': '600'}}) }}
+                <h6 class="h6-responsive" id="counter">{{lengthTextArea~'/'~lengthTextArea}}</h6>
+                {{ form_label(form.message, 'contact.message' | trans ) }}
+            </div>
+            <div class="text-center">
+                {{ form_widget(form.send,  {'label':'contact.send' | trans, 'attr': {'class': 'btn btn-primary', 'data-value-before': 'contact.send' | trans, 'data-value-after': 'contact.sending' | trans }}) }}
+            </div>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}
+
+{% block footer %}
+    {% include 'footer.html.twig' %}
+{% endblock %}
+
+{% block javascripts %}
+    <script nonce="{{ csp_nonce('script') }}" defer src="javascript/mdb/jquery.min.js"></script>
+    <script nonce="{{ csp_nonce('script') }}" defer src="javascript/mdb/mdb.min.js"></script>
+    <script nonce="{{ csp_nonce('script') }}" defer src="javascript/sweetalert.min.js"></script>
+
+    <script nonce="{{ csp_nonce('script') }}">
+        {% include 'javascript/contact.js.twig' %}
+    </script>
+{% endblock %}

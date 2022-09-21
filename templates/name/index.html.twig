@@ -1,0 +1,301 @@
+{% extends 'base.html.twig' %}
+
+{% block language %}
+    lang="{{ app.request.getLocale() }}"
+{% endblock %}
+
+{% block stylesheets %}
+    {% set title = webSiteName ~ " - " ~ 'edition.edition' | trans %}
+    {% set description = 'meta.meta2' | trans({'%webSiteName%': webSiteName}) %}
+
+    <link rel="stylesheet" href="style/bs-stepper.min.css" type="text/css">
+    <link rel="stylesheet" href="style/edition1.css" type="text/css">
+    <link rel="stylesheet" href="style/textFonts1.css" type="text/css">
+    <link rel="stylesheet" href="style/stripe.css" type="text/css">
+    <link rel="stylesheet" href="style/mediaQueries.css" type="text/css">
+
+    <title>{{ title }}</title>
+
+    <meta name="Description" content="{{ description }}">
+
+    <meta property="og:title" content="{{ title }}"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="{{ url('edition') }}"/>
+    <meta property="og:image" content="{{url('index')~bannerPath}}"/>
+    <meta property="og:site_name" content="{{ webSiteName }}"/>
+    <meta property="og:description" content="{{ description }}"/>
+{% endblock %}
+
+{% block nav %}
+    {% include 'navBar2.html.twig' %}
+{% endblock %}
+
+{% block main %}
+<div id="stepperContainer" class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div id="stepper" class="bs-stepper">
+                <div id="stepperHeader" class="bs-stepper-header">
+                    <div class="step" data-target="#part1">
+                        <button id="buttonPart1" type="button" class="btn step-trigger grey lighten-1">
+                            <span class="bs-stepper-circle">1</span>
+                            <span class="bs-stepper-label">{{ 'edition.edition' | trans }}</span>
+                        </button>
+                    </div>
+                    <div class="line"></div>
+                    <div class="step" data-target="#part2">
+                        <button id="buttonPart2" type="button" class="btn step-trigger grey lighten-1" disabled="disabled">
+                            <span class="bs-stepper-circle">2</span>
+                            <span class="bs-stepper-label">{{ 'edition.payment.payment' | trans }}</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bs-stepper-content">
+                    <div id="part1" class="content part border border-light p-5 grey lighten-1">
+                        <h1 class="h1-responsive text-part">{{ 'edition.customizeName' | trans }}</h1>
+                        <div id="creation" class="container">
+                            <div class="row">
+                                <div class="col-6 d-flex">
+                                    <div id="nameCreation" class="md-form form-lg col-9">
+                                        <input type="text" id="nameField" class="form-control form-control-lg" maxlength="{{ lengthMaxName }}" required>
+                                        <h6 id="counter" class="pull-right h6-responsive">{{ lengthMaxName~'/'~lengthMaxName }}</h6>
+                                        <label id="labelNameField" for="nameField">{{ 'edition.yourName' | trans }}</label>
+                                        <small id="msgNameField" class="text-danger"></small>
+                                        <a id="profilePictureLink" target="_blank">
+                                            <img id="profilePicture" class="profilePicture"/>
+                                        </a>
+                                    </div>
+                                    <input type="color" id="colors" tabindex=-1 value="{{ default.color }}">
+                                </div>
+                                <div id="secondLine" class="col-12 d-flex">
+                                    <div id="sizesDiv" class="selectList col-4">
+                                        <select id="sizes" class="browser-default custom-select">
+                                            {% for size in sizes %}
+                                                {% if default.size == size.size %}
+                                                    <option selected>{{ size.size }}pt</option>
+                                                {% else %}
+                                                    <option>{{ size.size }}pt</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+
+                                    <div id="textFontDiv" class="selectList col-7">
+                                        <select id="textFonts" class="browser-default custom-select">
+                                            {% for textFont in textFonts %}
+                                                {% if default.textFont == textFont.textFont %}
+                                                    <option selected data-bold="{{textFont.boldAvailable}}"
+                                                            data-italic="{{textFont.italicAvailable}}">
+                                                                {{ textFont.textFont }}
+                                                    </option>
+                                                {% else %}
+                                                    <option data-bold="{{textFont.boldAvailable}}"
+                                                            data-italic="{{textFont.italicAvailable}}">
+                                                                {{ textFont.textFont }}
+                                                    </option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+
+                                    <button id="bold" type="button" class="btn btn-primary bs-stepper-circle" data-toggle="button" aria-pressed="false">
+                                        {{ 'edition.g' | trans }}
+                                    </button>
+                                    <button id="italic" type="button" class="btn btn-primary bs-stepper-circle" data-toggle="button" aria-pressed="false">
+                                        {{ 'edition.i' | trans }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <input type="hidden" id="hiddenValueElement" data-delay_refresh="{{ delaiRefreshNamesJS }}"/>
+
+                        <h1 class="h1-responsive text-part">{{ 'edition.placeAnyWhere' | trans }}</h1>
+                        <div id="containerNamesAll" class="containerNamesAll">
+                            <div id="containerNames" class="containerNames">
+                                <img id="imageName" class="imageName" src="images/wall_v.jpg" width="{{ imageWidth }}" height="{{ imageHeight }}" alt="{{ 'edition.imageName' | trans }}"/>
+                                <div id="names">
+                                    {% include 'names.html.twig' with names %}
+                                </div>
+                                <div id="mainName" class="name tooltip">
+                                    <span id="tooltipText" class="tooltipText"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="displayTime">
+                            <label for="delays">{{ 'edition.durationName' | trans }}</label>
+                            <select id="delays" class="browser-default custom-select selectList col-6">
+                                {% for delay in delays %}
+                                    {% set delayTrans = "edition.delay.day"~delay.nbDays %}
+                                    {% if default.delay == delay.nbDays %}
+                                        <option selected value="{{ delay.nbDays}}">{{ delayTrans | trans }}</option>
+                                    {% else %}
+                                        <option value="{{ delay.nbDays}}">{{ delayTrans | trans }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button id="validatePart1" class="btn btn-primary">{{ 'edition.next' | trans }}</button>        
+                    </div>
+
+                    <div id="part2" class="content part border border-light p-5 grey lighten-1">
+                        <h1 class="h1-responsive text-part">{{ 'edition.payment.buyName' | trans }}</h1>
+
+                        <div id="promotionPart" class="card p-2">
+                            <div class="input-group">
+                                <input id="codeInput" name="codeInput" type="text" class="form-control" required placeholder="{{ 'edition.billing.discountCode' | trans }}">
+                                <div class="input-group-append">
+                                    <button id="promotionValidate" class="btn btn-primary">{{ 'edition.billing.check' | trans }}</button>
+                                </div>
+                            </div>
+                            <div id="promotiontext"></div>
+                        </div>
+
+                        <div id="summary" class="row">
+                            <div class="col-lg-12">
+                                <div class="card">
+                                    <h5 class="card-header h5-responsive light-blue lighten-1 white-text font-weight-bold text-center py-3">
+                                        {{ 'edition.billing.orderSummary' | trans }}
+                                    </h5>
+                                    <div class="card-body">
+                                        <ul class="list-group">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                {{ 'edition.billing.article' | trans }}
+                                                <span id="summaryArticlePrice" class="badge badge-primary badge-pill"></span>
+                                            </li>
+                                            <li id="summaryPromotion" class="list-group-item justify-content-between align-items-center">
+                                                {{ 'edition.billing.promotion' | trans }}
+                                                <span id="summaryPromotionPrice" class="badge badge-primary badge-pill"></span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="card-footer">
+                                        <ul class="list-group">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold">
+                                                {{ 'edition.payment.totalAmount' | trans }}
+                                                <h4 class="h4-responsive"><span id="summaryTotal" class="badge badge-primary badge-pill"></span></h4>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                            
+                        <form id="paymentForm" class="text-center border border-light p-2 cell example example1" method="POST">
+                            <div id="billingInformation">
+                                <p class="h4 h4-responsive mb-4">{{ 'edition.billing.information' | trans }}</p>
+                                <div id="billingInformationFields">
+                                    <div class="md-form form-lg">
+                                        <input type="text" id="buyerName" name="buyerName" class="form-control form-control-lg" required>
+                                        <label for="buyerName">{{ 'edition.name' | trans }}</label>
+                                    </div>
+                                    <div class="md-form form-lg">
+                                        <input type="email" id="buyerEmail" name="buyerEmail" class="form-control form-control-lg validate" required>
+                                        <label for="buyerEmail" data-error="{{ 'contact.incorrect' | trans }}" data-success="{{ 'contact.correct' | trans }}">{{ 'edition.email' | trans }}</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion" id="accordionExample">
+                                <p class="h4 h4-responsive mb-4">
+                                    {{ 'edition.payment.paymentMethodChoice' | trans }}
+                                </p>
+                                <p id="consentCGV" class="p p-responsive mb-2">
+                                    {{ 'edition.consent' | trans }}
+                                     <a href="{{ path('CGV') }}" target="_blank">{{ 'edition.consentLink' | trans({'%webSiteName%': webSiteName}) }}</a>
+                                </p>
+
+                                <div class="card">
+                                    <div class="card-header mb-0" id="headingOne">
+                                        <div class="btn btn-link btnPaymentMethod card-block" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" role="button">
+                                            <div class="row">
+                                                <div class="col">
+                                                    {{ 'edition.payment.card' | trans }}
+                                                </div>
+                                                <div class="col">
+                                                    <img id="cardImg" src="images/icon_cards.png" alt="{{ 'edition.payment.imageCards' | trans }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <fieldset id="stripeFieldset">
+                                                <div id="stripeRow" class="row">
+                                                    <div id="example1-card"></div>
+                                                </div>
+                                            </fieldset>
+                                            <div class="error" role="alert">
+                                                <span class="message"></span>
+                                            </div>
+                                            <button id="buttonStripe" class="btn btn-primary" type="submit" 
+                                                    data-tid="elements_examples.form.pay_button"
+                                                    data-value-before={{ 'edition.payment.pay' | trans }}
+                                                    data-value-after={{ 'edition.payment.payment' | trans }}>
+                                                {{ 'edition.payment.pay' | trans }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-header mb-0" id="headingTwo">
+                                        <div class="btn btn-link btnPaymentMethod card-block" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" role="button">
+                                            <div class="row">
+                                                <div class="col">
+                                                    {{ 'edition.payment.payPal' | trans }}
+                                                </div>
+                                                <div class="col">
+                                                    <img id="paypalImg" src="images/icon_paypal.png" alt="{{ 'edition.payment.payPalLogo' | trans }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <p class="card-text">{{ 'edition.payment.payPalSelection' | trans }}</p>
+                                            <div id="paypal-button-container"></div>
+                                            <div id="loadingPayPal" class="card-tex"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="tokenCsrf" name="token" value="{{ csrf_token('add-name') }}"/>
+                        </form>
+                        <button id="cancelPart2" class="btn btn-primary">{{ 'edition.previous' | trans }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+    {% include 'footer.html.twig' %}
+{% endblock %}
+
+{% block javascripts %}
+    <script nonce="{{ csp_nonce('script') }}" src="https://js.stripe.com/v3/"></script>
+    <script nonce="{{ csp_nonce('script') }}"  data-csp-nonce="{{ csp_nonce('script') }}"  src="https://www.paypal.com/sdk/js?client-id={{ paypalClientId }}&disable-funding=credit,card&currency={{ currency }}"></script>
+
+    <script nonce="{{ csp_nonce('script') }}" src="javascript/mdb/jquery.min.js"></script>
+    <script nonce="{{ csp_nonce('script') }}" src="javascript/mdb/bootstrap.min.js"></script>
+    <script nonce="{{ csp_nonce('script') }}" src="javascript/mdb/mdb.min.js"></script>
+    <script nonce="{{ csp_nonce('script') }}" src="javascript/bs-stepper.min.js"></script>
+    <script nonce="{{ csp_nonce('script') }}" src="javascript/draggabilly_min.js"></script>
+    <script nonce="{{ csp_nonce('script') }}" src="javascript/sweetalert.min.js"></script>
+
+    <script nonce="{{ csp_nonce('script') }}">
+        {% include 'javascript/edition.js.twig' %}
+    </script>
+
+    <script nonce="{{ csp_nonce('script') }}">
+        {% include 'javascript/stripe.js.twig' %}
+    </script>
+
+    <script nonce="{{ csp_nonce('script') }}">
+        {% include 'javascript/paypal.js.twig' %}
+    </script>
+{% endblock %}

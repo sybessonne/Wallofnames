@@ -1,0 +1,17 @@
+main
+{
+	text-align: center;
+	padding-bottom: 25%;
+	display: block;
+    margin: 2% 25%;
+}
+
+#titleError
+{
+	font-size: 70pt;
+}
+
+#notFound
+{
+	font-size: 22pt;
+}

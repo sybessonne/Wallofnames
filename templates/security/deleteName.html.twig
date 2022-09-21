@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block language %}
+    lang="{{ app.request.getLocale() }}"
+{% endblock %}
+
+{% block stylesheets %}
+    <title>Suppression d'un nom</title>
+    <style>
+        body
+        {
+            background-image: none;
+            background-color:#e3fcff;
+            text-align:center;
+        }
+
+        form{
+            margin-right:auto;
+            margin-left:auto;
+            margin-top: 3%;
+            width:22em;
+        }
+    </style>
+{% endblock %}
+
+{% block nav %}
+    <a href="{{ path('validate_names') }}" class="btn btn-primary btn-lg square" role="button">Retour</a>
+{% endblock %}
+
+{% block main %}
+    {% if refundStripe %}
+        {% if refundStripe.status is same as("succeeded") %}
+            REFUND Stripe OK
+        {% else %}
+            REFUND Stripe impossible,<br>
+            id nom : {{name.id}}<br>
+            status : {{refundStripe.status}}
+        {% endif %}
+    {% endif %}
+    {% if refundPayPal %}
+        {% if refundPayPal.result.status is same as("COMPLETED") %}
+            REFUND PayPal OK
+        {% else %}
+            REFUND PayPal impossible,<br>
+            id nom : {{name.id}}<br>
+            status : {{refundPayPal.result.status}}
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
+
+{% block javascripts %}
+{% endblock %}

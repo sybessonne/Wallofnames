@@ -1,0 +1,36 @@
+main
+{
+  margin: 2% 25%;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+form h1
+{
+  text-align: center;
+}
+
+form button
+{
+  text-align: center;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+form
+{
+	border-radius: 10px;
+	padding: 2%;
+}
+
+#textAreaField
+{
+  text-align: right;
+}
+
+@media (max-width:768px) {
+  main
+  {
+    margin:2%;
+  }
+}

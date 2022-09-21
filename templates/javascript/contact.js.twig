@@ -1,0 +1,56 @@
+const message = document.getElementById("contact_message");
+const counter = document.getElementById("counter");
+const buttonSendContact = document.getElementById("contact_send");
+const form = document.getElementById("contactForm");
+const messageContactMax = {{lengthTextArea}};
+
+message.addEventListener("input", function(e) {
+	const length = message.value.length;
+	const remaining = messageContactMax - length;
+
+	counter.innerHTML = remaining + "/" + messageContactMax;
+});
+
+form.addEventListener("submit", function(e){
+	if($("#contact_name").val() !== "" && $("#contact_email").val() !== "" 
+	&& $("#contact_subject").val() !== "" && $("#contact_message").val() !== "")
+	{
+		buttonSendContact.disabled = true;
+		buttonSendContact.innerHTML = '<span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>' + buttonSendContact.dataset.valueAfter;
+
+		var formURL = "{{url('contact')}}";
+		var formData = new FormData(this);
+		$.ajax({
+			url: formURL,
+			type: 'POST',
+			data:  formData,
+			mimeType:"multipart/form-data",
+			contentType: false,
+			cache: false,
+			processData:false
+		}).done(function(data){
+			const dat = JSON.parse(data);
+
+			if(dat.error === 0)
+			{
+				$("#contactForm")[0].reset();
+				swal("{{ ('javascript.sentencesContact.3') | trans }}", dat.message, "success");
+			}
+			else
+			{
+				swal("{{ ('javascript.sentencesContact.2') | trans }}", dat.message, "error");
+			}
+		}).fail(function(qXHR, status, thrownError){
+			swal("{{ ('javascript.sentencesContact.2') | trans }}", "{{ ('javascript.sentencesContact.0') | trans }}", "error");
+		}).always(function(){
+			buttonSendContact.disabled = false;
+			buttonSendContact.innerHTML = buttonSendContact.dataset.valueBefore;
+		});
+	}
+	else
+	{
+		swal("{{ ('javascript.sentencesContact.2') | trans }}", "{{ ('javascript.sentencesContact.1') | trans }}", "error");
+	}
+	
+	e.preventDefault(); //Prevent Default action.
+});

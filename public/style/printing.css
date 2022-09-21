@@ -1,0 +1,41 @@
+body
+{
+	background-color: #ffffff;
+}
+
+footer
+{
+	display: none;
+}
+
+.containerNamesAll {
+  margin: 0 auto;
+  padding:0%;
+
+  display: flex;
+  text-align: center;
+  min-width: 75%;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  white-space:nowrap
+}
+
+.containerNames {
+  position:relative;
+  z-index: 1;
+  margin:0 auto;
+}
+
+#imageName{
+  display: block;
+}
+
+.name {
+  position: absolute;
+  top:0;
+  left:0;
+  padding: 0.5%;
+  z-index: 1;
+}

@@ -1,0 +1,290 @@
+{% extends 'base.html.twig' %}
+
+{% block language %}
+    lang="{{ app.request.getLocale() }}"
+{% endblock %}
+
+{% block stylesheets %}
+    <title>Valider un nom</title>
+    <style>
+        body
+        {
+            background-image: none;
+            background-color:#e3fcff;
+            text-align:center;
+        }
+
+        form{
+            margin-right:auto;
+            margin-left:auto;
+            margin-top: 3%;
+            width:22em;
+        }
+
+        #nameToValidate
+        {
+        text-align: center;
+        }
+
+        table
+        {
+        text-align: center;
+        margin-right: auto;
+        margin-left: auto;
+        width: 100%;
+        border-collapse: collapse;
+        }
+
+        table, tr, td
+        {
+        border-style: solid;
+        border-color: black;
+        }
+
+        .td1
+        {
+        width: 50%;
+        }
+
+        .td2, .td3
+        {
+        width:25%;
+        }
+
+        .tdButton
+        {
+        padding-bottom: 3%;
+        }
+
+        input:focus,
+        select:focus {
+        outline:  none;
+        }
+
+        .containerNamesAll{
+        margin: 2% auto;
+        display: flex;
+        text-align: center;
+        min-width: 75%;
+
+        overflow-x: auto;
+        overflow-y: hidden;
+
+        white-space:nowrap
+        }
+
+        .containerNames {
+        margin:0 auto;
+        border: 2px solid #000000;
+        position:relative;
+        z-index: 1;
+        }
+
+        #imageName{
+        display: block;
+        }
+
+        .name {
+        border: 0.5px solid #ffffff;
+        position: absolute;
+        top:0;
+        left:0;
+        padding:0.5%;
+        z-index: 1;
+        }
+
+        .name.is-pointer-down {
+        background: #09F;
+        z-index: 2;
+        }
+
+        .name.is-dragging { 
+            opacity: 0.7; 
+        }
+    </style>
+    <link rel="stylesheet" href="/style/textFonts1.css" type="text/css">
+{% endblock %}
+
+{% block nav %}
+    <a href="{{ path('easyadmin') }}" class="btn btn-primary btn-lg square" role="button">Return to admin page</a>
+{% endblock %}
+
+{% block main %}
+    Sur le mur apparait les noms qui ont été correctement achetés ou non<br>
+    C'est a dire les noms dont le flag confirmation est 0 ou 1 <br>
+    Je peux :<br>
+        - les valider pour récupérer l'argent (cela envoit le recu à la personne)<br>
+        - les supprimer pour supprimer le nom (cela envoi le mail de suppression à la personne, et celle ci n'est pas débitée)<br><br> 
+
+    <h1>Mur des noms</h1>
+    <div id="containerNamesAll" class="containerNamesAll">
+        <div id="containerNames" class="containerNames">
+            <img id="imageName" class="img-fluid" src="/images/wall_v.jpg" width="{{ imageWidth }}" height="{{ imageHeight }}" alt="{{ 'index.imageName' | trans }}"/>
+            <div id="names">
+                {% for name in namesForWall %}
+                    {% set bold = (name.bold|e) ? "B" : "" %}
+                    {% set italic = (name.italic|e) ? "I" : "" %}
+                    {% if name.confirmation %}
+                        <a href="{{ path('validate_names')~"#"~name.id}}">
+                            <div class="name" 
+                                style="color: {{ name.color|e }};
+                                        font-size:{{ name.size.size|e }}pt;
+                                        font-family:{{ name.textFont.textFont|e ~ bold ~ italic }};
+                                        left:{{ name.positionX|e }}px;
+                                        top:{{ name.positionY|e }}px">{{ name.name|e }}</div>
+                        </a>
+                    {% else %}
+                        <div class="name" 
+                            style="color: {{ name.color|e }};
+                                    font-size:{{ name.size.size|e }}pt;
+                                    font-family:{{ name.textFont.textFont|e ~ bold ~ italic }};
+                                    left:{{ name.positionX|e }}px;
+                                    top:{{ name.positionY|e }}px">{{ name.name|e }}</div>
+                    {% endif %}             
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <section>
+    <h1>Valider des noms</h1>
+    <div id="nameToValidate">
+        <table>
+            {% for name in names %}
+                <tr id="{{name.id}}">
+                    <td>{{name.id}}</td>
+                    <td class="td1">Id :{{name.id}}
+						<br>Nom:[{{name.name}}]
+                        <br>date_ajout:{{name.addedDate|date("d/m/Y H:i:s")}}
+						<br>confirmation:{{name.confirmation}}
+						<br>suppression:{{name.deletion}}
+						<br>prix:{{name.order.price ~ name.order.currency}}
+						<br>Code promo: {{ name.order.discountCode ? name.order.discountCode.code : 'NO' }}
+						<br>payé:{{name.order.paid}}
+						<br>Nom acheteur:{{name.order.buyerName}}
+						<br>Email acheteur:{{name.order.buyerEmail}}
+						<br>Méthode paiement:{{name.order.paymentMethod.methodName}}
+                    </td>
+
+                    <td colspan="2" class="td2">positionX:{{name.positionX}}
+						<br>positionY:{{name.positionY}}
+						<br>width:{{name.width}}
+						<br>height:{{name.height}}
+						<br>bold:{{name.bold}}
+						<br>italic:{{name.italic}}
+						</td>
+
+                    <td class="td3">
+						police:{{name.textFont.textFont}}
+						<br>taille:{{name.size.size}}
+						<br>délai nbJours:{{name.delay.nbDays}}
+						<br>grade:{{name.grade.type}}
+						<br>couleur:{{name.color}}</td>
+                </tr>
+
+                <tr>
+                    <td class="tdButton" colspan="3">
+                        <form id="validation{{name.id}}" action="validateName" method="post">
+                            <input type="hidden" name="idName" value="{{name.id}}"/>
+                            <input type="hidden" name="secretKey" value="{{name.secretKey}}"/>
+                            <input class="btn btn-primary" type="submit" name="valider" value="Valider"/>
+                        </form>
+                    </td>
+
+                    <td class="tdButton" colspan="2">
+                        <form id="deletion{{name.id}}" action="deleteName" method="post">
+                            <input type="hidden" name="idName" value="{{name.id}}"/>
+                            <input type="hidden" name="secretKey" value="{{name.secretKey}}"/>
+							<input class="btn btn-primary" type="submit" name="suppression" value="Supprimer"/>
+						</form>
+                    </td>
+
+                    <td class="tdButton" colspan="2">
+                        <form id="urlDisable{{name.id}}" action="disableUrl" method="post">
+                            <input type="hidden" name="idName" value="{{name.id}}"/>
+                            <input type="hidden" name="secretKey" value="{{name.secretKey}}"/>
+							<input class="btn btn-primary" type="submit" name="Desactiver" value="Désactiver URL"/>
+						</form>
+                    </td>
+                </tr>
+            {% endfor %}
+		</table>
+    </div>
+    <br><br><br>
+    </section>
+    {% for i in 1..nbReasons %}
+        <input id="reason{{i}}" type="hidden" value="{{ ('name.deleted.reasons.reason' ~ i) | trans }}"/>
+    {% endfor %}
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
+
+{% block javascripts %}
+    <script nonce="{{ csp_nonce('script') }}" defer src="/javascript/sweetalert2.min.js"></script>
+    <script nonce="{{ csp_nonce('script') }}">
+        {% for name in names %}
+            const validation{{name.id}} = document.getElementById('validation{{name.id}}');
+            validation{{name.id}}.addEventListener("submit", function(event) {
+                if(!confirm("Voulez vous vraiment ajouter ce nom ?"))
+                {
+                    event.preventDefault();
+                }
+            });
+
+            const deactivation{{name.id}} = document.getElementById('urlDisable{{name.id}}');
+            deactivation{{name.id}}.addEventListener("submit", function(event) {
+                if(!confirm("Voulez vous vraiment désactiver cette url ?"))
+                {
+                    event.preventDefault();
+                }
+            });
+
+            const deletion{{name.id}} = document.getElementById('deletion{{name.id}}');
+            deletion{{name.id}}.addEventListener("submit", function(event) {
+                confirmDeleteName({{name.id}}, event)
+            });
+        {% endfor %}
+
+        const inputOptions = new Promise((resolve) => {
+            resolve({
+                {% for i in 1..nbReasons %}
+                    reason{{i}}: document.getElementById('reason{{i}}').value,
+                {% endfor %}
+            })
+        })
+
+        function confirmDeleteName(idName, event) {
+            const {value: color} =  Swal.fire({
+                title: 'Select reason',
+                input: 'radio',
+                inputOptions: inputOptions,
+                inputValidator: (value) => {
+                    if (!value) {
+                        event.preventDefault();
+                        return 'You need to choose something!'
+                    }
+                }
+            }).then((result) => {
+                if (result.value) {
+                    if(confirm("Voulez vous vraiment supprimer ce nom ? "))
+                    {	
+                        var field =  document.createElement("INPUT");
+                        field.setAttribute("type", "hidden");
+                        field.setAttribute("name", "reason");
+                        field.setAttribute("value", result.value);
+
+                        var doc = document.getElementById("deletion" + idName);
+                        doc.appendChild(field);
+                        document.getElementById("deletion" + idName).submit();
+                    }
+                    else{
+                        event.preventDefault();
+                    }
+                }
+            })
+
+            event.preventDefault();
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block language %}
+    lang="fr"
+{% endblock %}
+
+{% block stylesheets %}
+    {% set title = webSiteName ~ " - " ~ 'CGV.title' | trans %}
+    {% set description = 'meta.meta5' | trans({'%webSiteName%': webSiteName}) %}
+
+    <link rel="stylesheet" href="style/CGV.css" type="text/css">
+    <title>{{ title }}</title>
+
+    <meta name="Description" content="{{ description }}">
+
+    <meta property="og:title" content="{{ title }}"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="{{ url('CGV') }}"/>
+    <meta property="og:image" content="{{url('index')~bannerPath}}"/>
+    <meta property="og:site_name" content="{{ webSiteName }}"/>
+    <meta property="og:description" content="{{ description }}"/>
+{% endblock %}
+
+{% block nav %}
+    {% include 'navBar1.html.twig' %}
+{% endblock %}
+
+{% block main %}
+	<div class="card grey lighten-1">
+	    <h1 class="card-header h1-responsive text-center">{{ 'CGV.title' | trans({}, "messages", "fr_FR")}}</h1>
+
+        <div class="card-body">
+            <div class="card-text">{{ 'CGV.introduction' | trans({'%webSiteName%': webSiteName,
+                                                                    '%webSiteUrl%': url('index'),
+                                                                    '%link_start_url%' : '<a href="'~path('index')~'">', 
+                                                                    '%link_end%' : '</a>'
+                                                                    },
+                                                                    "messages", "fr_FR") 
+                                                                | raw | nl2br }}</div>
+        </div>
+
+		{% for i in 1..9 %}
+        <div class="card-body">
+            <h3 class="card-title h3-responsive">{{ ('CGV.title' ~ i) | trans({}, "messages", "fr_FR") }}</h3>
+            <div class="card-text">{{ ('CGV.text' ~ i ) | 
+                            trans({'%webSiteName%': webSiteName,
+                            '%webSiteUrl%': url('index'), 
+                            '%addressContact%': addressContact, 
+                            '%link_start_privacy%' : '<a href="'~path('CGU')~'">',
+                            '%link_start_cgv%' : '<a href="'~path('CGV')~'">', 
+                            '%link_start_contact%' : '<a href="'~path('contact')~'">', 
+                            '%link_start_url%' : '<a href="'~path('index')~'">', 
+                            '%link_start_europa%' : '<a href="https://ec.europa.eu/consumers/odr/">', 
+                            '%link_end%' : '</a>'
+                            },"messages", "fr_FR") 
+                            | raw | nl2br}}
+            </div>
+        </div>
+		{% endfor %}
+	</div>
+{% endblock %}
+
+{% block footer %}
+    {% include 'footer.html.twig' %}
+{% endblock %}
+
+{% block javascripts %}
+    <script nonce="{{ csp_nonce('script') }}" defer src="javascript/mdb/jquery.min.js"></script>
+    <script nonce="{{ csp_nonce('script') }}" defer src="javascript/mdb/mdb.min.js"></script>
+{% endblock %}

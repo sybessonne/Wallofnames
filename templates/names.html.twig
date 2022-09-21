@@ -1,0 +1,21 @@
+{% for name in names %}
+    {% set bold = (name.bold|e) ? "B" : "" %}
+    {% set italic = (name.italic|e) ? "I" : "" %}
+    {% if name.urlEnabled %}
+        <a href="{{ instagramURL | replace({'*username*': name.name}) }}" target="_blank">
+            <div class="name" 
+                style="color: {{ name.color|e }};
+                        font-size:{{ name.size.size|e }}pt;
+                        font-family:{{ name.textFont.textFont|e ~ bold ~ italic }};
+                        left:{{ name.positionX|e }}px;
+                        top:{{ name.positionY|e }}px">{{ name.name|e }}</div>
+        </a>
+    {% else %}
+        <div class="name otherName" 
+            style="color: {{ name.color|e }};
+            font-size:{{ name.size.size|e }}pt;
+            font-family:{{ name.textFont.textFont|e ~ bold ~ italic }};
+            left:{{ name.positionX|e }}px;
+            top:{{ name.positionY|e }}px">{{ name.name|e }}</div>
+    {% endif %}             
+{% endfor %}

@@ -1,0 +1,723 @@
+const refreshDelay = {{delaiRefreshNamesJS}}
+const tooltipYes = "{{tooltipYes}}";
+const tooltipNo = "{{tooltipNo}}";
+const instagramUrl = "{{instagramBaseURL}}"
+
+const regexMainName = new RegExp({{regexMainName | raw}});
+const regexColor = new RegExp({{regexColor | raw}});
+const regexSize = new RegExp({{regexSize | raw}});
+const regexTextFont = new RegExp({{regexTextFont | raw}});
+
+const counter = document.getElementById('counter');
+const preview = document.getElementById('preview');
+const mainName = document.getElementById("mainName");
+const containerNamesAll = document.getElementById("containerNamesAll");
+const containerNames = document.getElementById("containerNames");
+const imageName = document.getElementById("imageName");
+
+let names = document.querySelectorAll('.otherName');
+const otherNames = document.getElementById('names');
+const namePeople = document.getElementById("nameField");
+const msgNameField = document.getElementById("msgNameField");
+const profilePictureLink = document.getElementById("profilePictureLink");
+const profilePicture = document.getElementById("profilePicture");
+
+const color = document.getElementById("colors");
+const size = document.getElementById("sizes");
+const textFont = document.getElementById("textFonts");
+const bold = document.getElementById("bold");
+const italic = document.getElementById("italic");
+const delay = document.getElementById("delays");
+let boldActivate = false;
+let boldSuffix = "";
+let italicActivate = false;
+let italicSuffix = "";
+const maxLengthName = namePeople.maxLength;
+let nameEmpty = true;
+let x = 0;
+let y = 0; 
+let longueurX = 0;
+let longueurY = 0;
+
+const buttonPart1 = document.getElementById("buttonPart1");
+const validatePart1 = document.getElementById("validatePart1");
+const cancelPart2 = document.getElementById("cancelPart2");
+
+const codePromotion = document.getElementById("codeInput");
+const promotionValidate = document.getElementById("promotionValidate");
+const promotionText = document.getElementById("promotiontext");
+
+const summaryArticlePrice = document.getElementById("summaryArticlePrice");
+const summaryPromotion = document.getElementById("summaryPromotion");
+const summaryPromotionPrice = document.getElementById("summaryPromotionPrice");
+const summaryTotal = document.getElementById("summaryTotal");
+
+let currentPart = 1;
+let promotionValue = "";
+let promotionMinPrice = 0;
+
+const buyerName = document.getElementById("buyerName");
+const buyerEmail = document.getElementById("buyerEmail");
+
+const loadingPayPal = document.getElementById("loadingPayPal");
+
+let mainNamePositionX = -1;
+let mainNamePositionY = -1;
+let mainNameWidth = -1;
+let mainNameHeight = -1;
+let nameNumber = 0;
+
+let alreadyPositioned = false;
+
+let priceValue = 0;
+let priceBeforePromoValue = 0;
+let stringPrice = "";
+let stringPriceNoPromotion = "";
+let errorGetPrice = false;
+const valueButton = validatePart1.innerHTML;
+
+const stepper = new Stepper(document.querySelector('#stepper'), {
+	linear: true,
+	animation: true
+})
+
+document.getElementById("part1").classList.remove("active");
+document.getElementById("part1").classList.remove("fade");
+
+namePeople.addEventListener("input", displayMainName);
+color.addEventListener("input", changeColor, false);
+size.addEventListener("change", changeSize);
+textFont.addEventListener("change", changeTextFont);
+bold.addEventListener("click", boldClick);
+italic.addEventListener("click", italicClick);
+delay.addEventListener("change", changeDelay);
+
+buttonPart1.addEventListener("click", goToPart1);
+validatePart1.addEventListener("click", part1to2);
+cancelPart2.addEventListener("click", goToPart1);
+
+codePromotion.addEventListener("keyup", function(event) {
+	if (event.keyCode === 13) {
+		event.preventDefault();
+		verifyCodePromotion();
+	}
+});
+promotionValidate.addEventListener("click", verifyCodePromotion);
+
+function displayMainName(){
+	mainName.innerHTML = namePeople.value + '<span id="tooltipText" class="tooltipText"></span>';
+	msgNameField.innerHTML = "";
+
+	const number = maxLengthName - namePeople.value.length;
+
+	if(number < 0)
+	{
+		namePeople.value = namePeople.value.substring(0, maxLengthName);
+	}
+	else
+	{
+		counter.innerHTML = number + "/" + maxLengthName;		
+	}
+
+	if(namePeople.value === "")
+	{
+		nameEmpty = true;
+		msgNameField.innerHTML = "{{ ('javascript.sentencesEdition.20') | trans }}";
+	}
+	else if(namePeople.value.length > maxLengthName)
+	{
+		msgNameField.innerHTML = "{{ ('javascript.sentencesEdition.1') | trans }}";
+	}
+	else if(!regexMainName.test(namePeople.value))
+	{
+		msgNameField.innerHTML = "{{ ('javascript.sentencesEdition.19') | trans }}";
+	}
+	else
+	{
+		nameEmpty = false;
+	}
+
+	clearPromotion();
+	checkMainName();
+	getPrice(true);
+	displayProfilePicture();
+}
+
+function displayProfilePicture()
+{
+	if(namePeople.value !== "")
+	{
+		const request = new XMLHttpRequest(); 
+		request.addEventListener('readystatechange', function() {
+			if(request.readyState === XMLHttpRequest.DONE) 
+			{
+				profilePictureLink.style.cursor = "pointer";
+				profilePictureLink.setAttribute("href", instagramUrl + namePeople.value);
+
+				if(request.status === 200)
+				{
+					let jsonResponse = JSON.parse(request.responseText);
+					profilePicture.setAttribute("src", jsonResponse["graphql"]["user"]["profile_pic_url_hd"]);
+				}
+				else{
+					profilePicture.setAttribute("src", "images/not_found.png");
+				}
+			}
+		});
+		request.open("GET", instagramUrl + namePeople.value + "/?__a=1", true);
+		request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+		request.send();
+	}
+	else
+	{
+		profilePictureLink.style.cursor = "default";
+		profilePictureLink.removeAttribute("href");
+		profilePicture.removeAttribute("src");
+	}
+}
+
+
+function changeColor(event) {
+	mainName.style.color = event.target.value;
+	getPrice(true);
+}
+
+function changeSize(){
+	mainName.style.fontSize = size.value;
+
+	checkMainName();
+	clearPromotion();
+	getPrice(true);
+}
+
+function changeDelay(){
+	clearPromotion();
+	getPrice(true);
+}
+
+function changeTextFont(){
+	const valueBI = textFont.options[textFont.selectedIndex];
+	const bold_available = parseInt(valueBI.dataset.bold);
+	const italic_available = parseInt(valueBI.dataset.italic);
+
+	if(!bold_available)
+	{
+		bold.classList.remove("active");
+		boldSuffix = "";
+		bold.hidden = true;
+		boldActivate = 0;
+	}
+	else
+	{
+		bold.hidden = false;
+	}
+
+	if(!italic_available)
+	{
+		italic.classList.remove("active");
+		italicSuffix = "";
+		italic.hidden = true;
+		italicActivate = false;
+	}
+	else
+	{
+		italic.hidden = false;
+	}
+
+	applicateTextFont();
+}
+
+function applicateTextFont()
+{
+	const val = textFont.value + boldSuffix + italicSuffix;
+	mainName.style.fontFamily = val;
+
+	checkMainName();
+	clearPromotion();
+	getPrice(true);
+}
+
+function boldClick()
+{
+	boldActivate = !boldActivate;
+	if(boldActivate)
+	{
+		boldSuffix = "B";
+	}
+	else
+	{
+		boldSuffix = "";
+	}
+
+	applicateTextFont();
+}
+
+function italicClick()
+{
+	italicActivate = !italicActivate;
+	if(italicActivate)
+	{
+		italicSuffix = "I";
+	}
+	else
+	{
+		italicSuffix = "";
+	}
+
+	applicateTextFont();
+}
+
+function part1to2()
+{
+	if(namePeople.value === "")
+	{
+		swal("{{ ('javascript.titlesEdition.0') | trans }}", "{{ ('javascript.sentencesEdition.0') | trans }}", "warning");
+		msgNameField.innerHTML = "{{ ('javascript.sentencesEdition.20') | trans }}";
+	}
+	else if(namePeople.value.length > maxLengthName)
+	{
+		swal("{{ ('javascript.titlesEdition.0') | trans }}", "{{ ('javascript.sentencesEdition.1') | trans }}", "warning");
+		msgNameField.innerHTML = "{{ ('javascript.sentencesEdition.1') | trans }}";
+	}
+	else if(!regexMainName.test(namePeople.value))
+	{
+		swal("{{ ('javascript.titlesEdition.0') | trans }}", "{{ ('javascript.sentencesEdition.2') | trans }}", "warning");
+		msgNameField.innerHTML = "{{ ('javascript.sentencesEdition.19') | trans }}";
+	}
+	else if(!regexColor.test(color.value))
+	{
+		swal("{{ ('javascript.titlesEdition.0') | trans }}", "{{ ('javascript.sentencesEdition.3') | trans }}", "warning");
+	}
+	else if(!regexSize.test(size.value))
+	{
+		swal("{{ ('javascript.titlesEdition.0') | trans }}", "{{ ('javascript.sentencesEdition.4') | trans }}", "warning");
+	}
+	else if(!regexTextFont.test(textFont.value))
+	{
+		swal("{{ ('javascript.titlesEdition.0') | trans }}", "{{ ('javascript.sentencesEdition.5') | trans }}", "warning");
+	}
+	else if(colision(0, 0) || outsideArea())
+	{
+		swal("{{ ('javascript.titlesEdition.1') | trans }}", "{{ ('javascript.sentencesEdition.6') | trans }}", "warning");
+	}
+	else
+	{
+		goToPart2();
+	}
+}
+
+function goToPart1()
+{
+	part2.style.display = "none";
+	part1.style.display = "block";
+	stepper.to(1);
+
+	jQuery('html, body').animate({scrollTop: 0}, 0);
+	currentPart = 1;
+}
+
+function goToPart2()
+{
+	part1.style.display = "none";
+	part2.style.display = "block";
+	stepper.to(2);
+
+	jQuery('html, body').animate({scrollTop: 0}, 0);
+	currentPart = 2;
+
+	buttonPart1.disabled = false;
+}
+
+function activatePart1(value)
+{
+	if(value)
+	{
+		part1.style.visibility = "hidden";
+		part1.style.display = "block";
+		part1.style.height = "0";
+	}
+	else
+	{
+		part1.style.visibility = "visible";
+		part1.style.height = "auto";
+		part1.style.display = "none";
+	}
+}
+
+function verificationFields()
+{
+	activatePart1(true);
+
+	let ok = false;
+	let error = 0;
+
+	getPrice(false);
+	refreshArea(false);
+
+	if(namePeople.value === "")
+	{
+		swal("{{ ('javascript.titlesEdition.0') | trans }}", "{{ ('javascript.sentencesEdition.0') | trans }}", "error");
+		error = 1;
+	}
+	else if(namePeople.value.length > maxLengthName)
+	{
+		swal("{{ ('javascript.titlesEdition.0') | trans }}", "{{ ('javascript.sentencesEdition.1') | trans }}", "error");
+		error = 1;
+	}
+	else if(!regexMainName.test(namePeople.value))
+	{
+		swal("{{ ('javascript.titlesEdition.0') | trans }}", "{{ ('javascript.sentencesEdition.2') | trans }}", "error");
+		error = 1;
+	}
+	else if(!regexColor.test(color.value))
+	{
+		swal("{{ ('javascript.titlesEdition.0') | trans }}", "{{ ('javascript.sentencesEdition.3') | trans }}", "error");
+		error = 1;
+	}
+	else if(!regexSize.test(size.value))
+	{
+		swal("{{ ('javascript.titlesEdition.0') | trans }}", "{{ ('javascript.sentencesEdition.4') | trans }}", "error");
+		error = 1;
+	}
+	else if(!regexTextFont.test(textFont.value))
+	{
+		swal("{{ ('javascript.titlesEdition.0') | trans }}", "{{ ('javascript.sentencesEdition.5') | trans }}", "error");
+		error = 1;
+	}
+	else if(outsideArea())
+	{
+		swal("{{ ('javascript.titlesEdition.1') | trans }}", "{{ ('javascript.sentencesEdition.9') | trans }}", "error");
+		error = 1;
+	}
+	else if(colision(0, 0))
+	{
+		swal("{{ ('javascript.titlesEdition.1') | trans }}", "{{ ('javascript.sentencesEdition.6') | trans }}", "error");
+		error = 1;
+	}
+	else if(buyerName.value === "")
+	{
+		swal("{{ ('javascript.titlesEdition.2') | trans }}", "{{ ('javascript.sentencesEdition.12') | trans }}", "error");
+		error = 2;
+	}
+	else if(priceValue === 0)
+	{
+		swal("{{ ('javascript.titlesEdition.2') | trans }}", "{{ ('javascript.sentencesEdition.21') | trans }}", "error");
+		error = 2;			
+	}
+	else
+	{
+		ok = true;
+	}
+
+	if(typeof boldActivate !== "boolean")
+	{
+		boldActivate = 0;
+	}
+	if(typeof italicActivate !== "boolean")
+	{
+		italicActivate = 0;
+	}
+
+	if(ok)
+	{
+		if(mainName.offsetLeft < 0)
+		{
+			mainName.style.left = 0;
+		}
+		if(mainName.offsetTop < 0)
+		{
+			mainName.style.top = 0;
+		}
+
+		mainNamePositionX = mainName.offsetLeft; 
+		mainNamePositionY = mainName.offsetTop;
+		mainNameWidth = mainName.clientWidth;
+		mainNameHeight = mainName.clientHeight;
+
+		activatePart1(false);
+	}
+	else
+	{
+		activatePart1(false);
+
+		if(error === 1)
+		{
+			goToPart1();
+		}
+	}
+
+	return ok;
+}
+
+mainName.style.fontSize = size.value;
+mainName.style.fontFamily = textFont.value;
+mainName.style.color = color.value;
+
+window.onload = function () 
+{ 
+	namePeople.focus();
+
+	document.getElementById("part1").classList.add("active");
+	document.getElementById("part1").classList.add("fade");
+
+	for(let i = 0; i < textFont.length; i++)
+	{
+		textFont.options[i].style.fontFamily = textFont.options[i].value;
+	}
+
+	for(let i = 0; i < size.length; i++)
+	{
+		size.options[i].style.fontSize = size.options[i].text;
+	}
+
+	setInterval(function() { refreshArea(true); }, refreshDelay);
+
+	const centerX = (containerNamesAll.scrollWidth > containerNamesAll.clientWidth) 
+				? (containerNamesAll.clientWidth) / 2
+				: (containerNames.clientWidth) / 2;
+
+	const centerY = 40;
+
+	mainName.style.left = centerX + "px";
+	mainName.style.top = centerY + "px";
+
+	checkMainName();
+	currentPart = 2;
+
+	draggiMainName.enable()
+
+	getPrice(true);
+}
+
+nameNumber = names.length;
+draggiMainName = new Draggabilly(mainName, {
+	containment: '.imageName'
+});
+
+draggiMainName.on('dragMove', function(event, pointer, moveVector) {
+	changeColorMainName(colision(moveVector.x, moveVector.y));
+});
+
+draggiMainName.on('dragEnd', function(event, pointer) {
+	changeColorMainName(colision(0, 0));
+})
+
+function outsideArea()
+{
+	let ok = false;
+
+	if(mainName.clientWidth + mainName.offsetLeft > imageName.clientWidth)
+	{
+		ok = true;
+	}
+
+	return ok;
+}
+
+function colision(moveX, moveY)
+{
+	x = mainName.offsetLeft + moveX;
+	y = mainName.offsetTop + moveY;	
+	longueurX = mainName.clientWidth;
+	longueurY = mainName.clientHeight;
+	let element;
+	let ok = false;
+
+	for(let i = nameNumber - 1; i >= 0 && !ok; i--)
+	{
+		element = names[i];
+		if(!((x >= element.offsetLeft + element.clientWidth)
+			|| (x + longueurX <= element.offsetLeft)
+			|| (y >= element.offsetTop + element.clientHeight)
+			|| (y + longueurY <= element.offsetTop)))
+		{
+			ok = true;
+		}
+	}
+
+	return ok;
+}
+
+function changeColorMainName(ok)
+{
+	let border = "solid #ff0000 2px";
+
+	if(ok)
+	{
+		tooltipText.textContent = tooltipNo;
+		tooltipText.classList.remove("tooltipYes");
+		tooltipText.classList.add("tooltipNo");
+	}
+	else
+	{
+		border = "solid #ffffff 2px";
+		tooltipText.textContent = tooltipYes;
+		tooltipText.classList.remove("tooltipNo");
+		tooltipText.classList.add("tooltipYes");
+	}
+
+	if(!nameEmpty)
+	{
+		mainName.style.border = border;
+	}
+	else
+	{
+		mainName.style.border = "none";
+	}
+
+	tooltipText.style.left = '50%';
+	tooltipText.style.marginLeft = "-10px"; /* = width/2 */
+
+	if(y < 50)
+	{
+		tooltipText.style.bottom = "auto";
+		tooltipText.style.top = '100%';
+	}
+	else
+	{
+		tooltipText.style.bottom = "100%";
+		tooltipText.style.top = "auto";
+	}
+}
+
+function checkMainName()
+{
+	if(outsideArea())
+	{
+		changeColorMainName(true);
+	}
+	else
+	{
+		changeColorMainName(colision(0, 0));
+	}
+}
+
+function refreshArea(asynchronous)
+{
+	const request = new XMLHttpRequest(); 
+	request.addEventListener('readystatechange', function() {
+		if(request.readyState === XMLHttpRequest.DONE) 
+		{
+			if(request.status === 200)
+			{
+				otherNames.innerHTML = request.responseText;
+				names = document.querySelectorAll('.otherName');
+				nameNumber = names.length;
+				checkMainName();
+			}
+		}
+	});
+	request.open("GET", "{{url('getNamesEdition')}}", asynchronous);
+	request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	request.send();
+}
+
+function getPrice(asynchronous)
+{
+	const datas = {name:namePeople.value,
+		color:color.value, 
+		size:size.value, 
+		textFont:textFont.value, 
+		bold:(+boldActivate),
+		italic: (+italicActivate), 
+		delay: delay.value
+	}
+	if(promotionValue !== "")
+	{
+		datas.codePromotion = promotionValue;
+	}
+
+	$.get("{{url('getPrice')}}", datas, function(response){
+		if(response.error === 0)
+		{
+			priceValue = response.price;
+			priceBeforePromoValue = response.priceBeforePromotion;
+			stringPrice = response.stringPrice;
+			stringPriceNoPromotion = response.stringPriceNoPromotion;
+			errorGetPrice = false;
+		}
+		else
+		{
+			priceValue = 0;
+			priceBeforePromoValue = 0;
+			stringPriceNoPromotion = 0
+			stringPrice = "";
+
+			if(currentPart === 3 && !errorGetPrice)
+			{		
+				errorGetPrice = true;
+				swal("{{ ('javascript.titlesEdition.2') | trans }}", "{{ ('javascript.sentencesEdition.11') | trans }}", "error");
+			}
+		}
+
+		const valPrice = "  ("  + stringPrice + ")";
+		validatePart1.innerHTML = valueButton + valPrice;
+		summaryArticlePrice.innerHTML = stringPriceNoPromotion;
+		summaryTotal.innerHTML = stringPrice;
+	})
+	.fail(function(response){
+		if(currentPart === 3 && !errorGetPrice)
+		{
+			errorGetPrice = true;
+			swal("{{ ('javascript.titlesEdition.2') | trans }}", "{{ ('javascript.sentencesEdition.11') | trans }}", "error");
+		}
+	});
+}
+
+function verifyCodePromotion(e)
+{
+	if(codePromotion.value === "")
+	{
+		swal("{{ ('javascript.titlesEdition.3') | trans }}", "{{ ('javascript.sentencesEdition.16') | trans }}", "error");
+	}
+	else
+	{
+		$.get("{{url('verifyPromotion')}}", {codePromotion:codePromotion.value}, function(response){
+			if(response.error === 0)
+			{
+				promotionMinPrice = response.promotionMinPrice;
+				
+				if(priceValue < promotionMinPrice) 
+				{
+					swal("{{ ('javascript.titlesEdition.2') | trans }}", "{{ ('javascript.sentencesEdition.18') | trans }}".format(promotionMinPrice), "error");
+				}
+				else
+				{
+					promotionText.innerHTML = response.promotionText;
+					summaryPromotion.style.display = "flex";
+					summaryPromotionPrice.innerHTML = response.promotion;
+					codePromotion.value = "";
+					promotionValue = response.codePromotion;
+					swal("{{ ('javascript.titlesEdition.4') | trans }}", response.message, "success");
+					getPrice(true);
+				}
+			}
+			else
+			{
+				clearPromotion();
+				swal("{{ ('javascript.titlesEdition.3') | trans }}", response.message, "error");
+				getPrice(true);
+			}
+		})
+		.fail(function(response){
+			swal("{{ ('javascript.titlesEdition.2') | trans }}", "{{ ('javascript.sentencesEdition.17') | trans }}", "error");
+		});
+	}
+}
+
+function clearPromotion()
+{
+	promotionText.innerHTML = "";
+	summaryPromotion.style.display = "none";
+	promotionValue = "";
+	promotionMinPrice = 0;
+	codePromotion.value = "";
+}
+
+String.prototype.format = function() {
+    let formatted = this;
+    for (let arg in arguments) {
+        formatted = formatted.replace("{" + arg + "}", arguments[arg]);
+    }
+    return formatted;
+};

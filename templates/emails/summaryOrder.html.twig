@@ -1,0 +1,28 @@
+
+{% set colorYN = (name.color is same as("#000") or name.color is same as("#000000"))
+					? ('mail.summaryOrder.no' | trans({}, "messages", buyerLanguage)) 
+					: ('mail.summaryOrder.yes' | trans({}, "messages", buyerLanguage))  %}
+
+{% set boldYN = (name.bold) 
+					? ('mail.summaryOrder.yes' | trans({}, "messages", buyerLanguage)) 
+					: ('mail.summaryOrder.no' | trans({}, "messages", buyerLanguage))  %}
+
+{% set italicYN = (name.italic) 
+					? ('mail.summaryOrder.yes' | trans({}, "messages", buyerLanguage)) 
+					: ('mail.summaryOrder.no' | trans({}, "messages", buyerLanguage))  %}
+
+{{ 'mail.summaryOrder.name' | trans({'%name%': name.name}, "messages", buyerLanguage)}}
+<br>
+{{ 'mail.summaryOrder.color' | trans({'%color%': colorYN}, "messages", buyerLanguage)}}
+<br>
+{{ 'mail.summaryOrder.size' | trans({'%size%': name.size.size}, "messages", buyerLanguage)}}
+<br>
+{{ 'mail.summaryOrder.textFont' | trans({'%textFont%': name.textFont.textFont}, "messages", buyerLanguage)}}
+<br>
+{{ 'mail.summaryOrder.bold' | trans({'%bold%': boldYN}, "messages", buyerLanguage)}}
+<br>
+{{ 'mail.summaryOrder.italic' | trans({'%italic%': italicYN}, "messages", buyerLanguage)}}
+<br>
+{% set delayTrans = "edition.delay.day"~name.delay.nbDays %}
+{% set delay = (delayTrans | trans({}, "messages", buyerLanguage)) %}
+{{ 'mail.summaryOrder.delay' | trans({'%delay%': delay}, "messages", buyerLanguage) }}

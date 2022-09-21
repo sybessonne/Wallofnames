@@ -1,0 +1,179 @@
+let stripeErrors = new Map();
+
+{% set indexes = ["default",
+                "incorrect_cvc",
+                "incorrect_number",
+                "card_declined" ,
+                "expired_card"  ,
+                "processing_error"  ,
+                "invalid_card_type"  ,
+                "invalid_expiry_month", 
+                "invalid_expiry_year" ,
+                "invalid_number"] %}
+
+{% for i in indexes %}
+    stripeErrors.set("{{i}}", "{{ ('javascript.stripeErrors.' ~ i ) | trans }}");
+{% endfor %}
+
+const stripe = Stripe('{{stripePublicKey}}');
+
+const form = document.getElementById("paymentForm");
+const buttonStripe = form.buttonStripe;
+const error = form.querySelector('.error');
+const errorMessage = error.querySelector('.message');
+
+const elementCard = stripe.elements();
+
+const card = elementCard.create('card', {
+  hidePostalCode: true,
+  iconStyle: 'solid',
+  style: {
+    base: {
+      iconColor: '#ffffff',
+      color: '#fff',
+      fontWeight: 500,
+      fontFamily: 'Roboto, Open Sans, Segoe UI, sans-serif',
+      fontSize: '16px',
+      fontSmoothing: 'antialiased',
+
+      ':-webkit-autofill': {
+        color: '#fce883',
+      },
+      '::placeholder': {
+        color: '#87BBFD',
+      },
+    },
+    complete: {
+      iconColor: '#ffffff',
+      color: '#ffffff',
+    },
+    invalid: {
+      iconColor: '#a60a0a',
+      color: '#a60a0a',
+    },
+  },
+});
+
+card.mount('#example1-card');
+
+card.on('change', function(event) {
+  if (event.error) {
+    error.classList.add('visible');
+    errorMessage.innerText = event.error.message;
+  }
+  else
+  {
+    errorMessage.innerText = "";
+  }
+});
+
+form.addEventListener('submit', function(e) {
+  e.preventDefault();
+  disableInputs(true);
+
+  if(verificationFields())
+  {
+    stripe.createPaymentMethod(
+      'card',
+      card
+    ).then(function(result) {
+      if (result.error) {
+        disableInputs(false);
+        swal("{{ ('javascript.titlesEdition.2') | trans }}", "{{ ('javascript.sentencesEdition.14') | trans }}", "error");
+      } else {
+        sendToServer(result.paymentMethod.id);
+      }
+    });
+  }
+  else
+  {
+    disableInputs(false);
+  }
+});
+
+function disableInputs(bool) {
+  buyerName.disabled = bool;
+  buyerEmail.disabled = bool;
+  buttonStripe.disabled = bool;
+
+  if(bool)
+  {
+    buttonStripe.innerHTML = '<span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>' + buttonStripe.dataset.valueAfter;
+    loadingPayPal.innerHTML = '<span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>';
+  }
+  else{
+    buttonStripe.innerHTML = buttonStripe.dataset.valueBefore;
+    loadingPayPal.innerHTML = "";
+  }
+}
+
+function confirmPayment(response) {
+  stripe.confirmCardPayment(
+    response.clientSecret
+  ).then(function(result) {
+    if(result.error) 
+    {
+      if(stripeErrors.has(result.error.code))
+      {
+        swal("{{ ('javascript.titlesEdition.2') | trans }}", stripeErrors.get(result.error.code), "error");
+      }
+      else
+      {
+        swal("{{ ('javascript.titlesEdition.2') | trans }}", stripeErrors.get('default'), "error");
+      }
+      disableInputs(false);
+    } 
+    else 
+    {
+      if(result.paymentIntent.status === 'succeeded') 
+      {
+        swal("{{ ('javascript.titlesEdition.4') | trans }}", response.message, "success")
+          .then((value) => {
+            document.location = "/";
+        });
+      }
+    }
+  });   
+}
+
+function sendToServer(paymentMethod)
+{
+	const datas = {
+    paymentMethod:"StripeCard",
+    stripePaymentMethod:paymentMethod,
+    buyerName:buyerName.value,
+    buyerEmail:buyerEmail.value,
+    name:namePeople.value,
+		color:color.value, 
+		size:size.value, 
+    textFont:textFont.value, 
+    positionX:mainNamePositionX,
+    positionY:mainNamePositionY, 
+    width:mainNameWidth,
+    height:mainNameHeight, 
+		bold:(+boldActivate),
+		italic: (+italicActivate), 
+    delay: delay.value,
+    price:priceValue,
+    priceBeforePromotion:priceBeforePromoValue,
+    tokenCsrf:document.getElementById("tokenCsrf").value
+	}
+	if(promotionValue !== "")
+	{
+		datas.codePromotion = promotionValue;
+  }
+  
+  $.post( "{{url('addName')}}", datas, function(response) {
+    if(response.error === 0)
+    {
+      confirmPayment(response);
+    }
+    else{
+      swal("{{ ('javascript.titlesEdition.2') | trans }}", response.message, "error");
+      disableInputs(false);
+    }
+  }).fail(function() {
+      swal("{{ ('javascript.titlesEdition.2') | trans }}", "{{ ('javascript.sentencesEdition.10') | trans }}", "error");
+      disableInputs(false);
+  });
+}

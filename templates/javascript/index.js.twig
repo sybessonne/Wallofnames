@@ -1,0 +1,24 @@
+const refreshDelay = {{delaiRefreshNamesJS}}
+
+const otherNames = document.getElementById('names');
+
+setInterval(refreshArea, refreshDelay); 
+
+function refreshArea()
+{
+	const request = new XMLHttpRequest(); 
+	request.addEventListener('readystatechange', function() {
+		if(request.readyState === XMLHttpRequest.DONE) 
+		{
+			if(request.status === 200)
+			{
+				otherNames.innerHTML = request.responseText;
+			}
+		}
+	});
+
+	request.open("GET", "{{url('getNamesIndex')}}", true);
+
+	request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	request.send();
+}

@@ -1,0 +1,109 @@
+let responsePayPalDone = "";
+let orderId = "";
+let disableButtonPayPal = false;
+
+paypal.Buttons({
+  env: 'sandbox',
+
+  style: {
+    layout:  'vertical',
+    color:   'gold',
+    shape:   'rect',
+    label:   'paypal'
+  },
+  onClick: function(data, actions) {
+    disableInputs(true);
+    if(verificationFields())
+    {
+      return actions.resolve();
+    }
+    else
+    {
+      disableInputs(false);
+      return actions.reject();
+    }
+  },
+  createOrder: function(data) {
+    let bodyToSend = "paymentMethod=PayPal&buyerName=" + buyerName.value + "&buyerEmail=" + buyerEmail.value +
+    "&name=" + namePeople.value + "&color=" + color.value + 
+    "&size=" + size.value + "&textFont=" + textFont.value + 
+    "&positionX=" + mainNamePositionX + "&positionY=" + mainNamePositionY + 
+    "&width=" + mainNameWidth + "&height=" + mainNameHeight + 
+    "&bold=" + (+boldActivate) + "&italic=" + (+italicActivate) + 
+    "&delay=" + delay.value + 
+    "&price=" + priceValue + "&priceBeforePromotion=" + priceBeforePromoValue + 
+    "&tokenCsrf=" + document.getElementById("tokenCsrf").value;
+    
+    if(promotionValue !== "")
+    {
+      bodyToSend += "&codePromotion=" + promotionValue;
+    }
+    
+    return fetch("{{url('addName')}}", {
+      method: 'post',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'content-type': 'application/x-www-form-urlencoded'
+      },
+      body: bodyToSend
+    }).then(function(res) {
+      return res.json();
+    }).then(function(data) {
+      if(data.error === 0)
+      {
+        responsePayPalDone = data.message;
+        orderId = data.clientSecret;
+        return data.clientSecret;
+      }
+      else
+      {
+        swal("{{ ('javascript.titlesEdition.3') | trans }}", data.message, "error");
+        disableInputs(false);
+      }
+    })
+  },
+  onApprove: function(data, actions) {
+    return fetch("{{url('capturePayPalPayment')}}", {
+      method: 'post',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'content-type': 'application/x-www-form-urlencoded'
+      },
+      body: "orderID=" + data.orderID
+    }).then(function(res) {
+      return res.json();
+    }).then(function(data) {
+      if(!data.error)
+      {
+        swal("{{ ('javascript.titlesEdition.4') | trans }}", data.message, "success")
+        .then((value) => {
+          document.location = "/";
+        });
+      }
+      else{
+        swal("{{ ('javascript.titlesEdition.3') | trans }}", data.message, "error")
+        disableInputs(false);
+      }
+    })
+  },
+  onError: function (err) {
+    removeName();
+    disableInputs(false);
+  },
+  onCancel: function(err) {
+    removeName();
+    disableInputs(false);
+  }
+}).render('#paypal-button-container');
+
+function removeName()
+{
+  fetch("{{url('removeName')}}", {
+    method: 'post',
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest',
+      'content-type': 'application/x-www-form-urlencoded'
+    },
+    body: "orderID=" + orderId
+  });
+}

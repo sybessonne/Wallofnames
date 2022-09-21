@@ -1,0 +1,87 @@
+{% extends 'base.html.twig' %}
+
+{% block language %}
+    lang="{{ app.request.getLocale() }}"
+{% endblock %}
+
+{% block stylesheets %}
+    {% set title = webSiteName ~ " - " ~ 'CGU.title' | trans %}
+    {% set description = 'meta.meta4' | trans({'%webSiteName%': webSiteName}) %}
+
+    <link rel="stylesheet" href="style/CGU.css" type="text/css">
+    <title>{{ title }}</title>
+
+    <meta name="Description" content="{{ description }}">
+
+    <meta property="og:title" content="{{ title }}"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="{{ url('CGU') }}"/>
+    <meta property="og:image" content="{{url('index')~bannerPath}}"/>
+    <meta property="og:site_name" content="{{ webSiteName }}"/>
+    <meta property="og:description" content="{{ description }}"/>
+{% endblock %}
+
+{% block nav %}
+    {% include 'navBar1.html.twig' %}
+{% endblock %}
+
+{% block main %}
+	<div class="card grey lighten-1">
+	    <h1 class="card-header h1-responsive text-center">{{ 'CGU.title' | trans }}</h1>
+
+        <h3 class="card-header h3-responsive text-center">{{ 'legalNotices.subtitle' | trans }}</h3>
+        <div class="card-body">
+            <div class="card-text">{{ 'legalNotices.introduction' | trans }}</div>
+        </div>
+
+		{% for i in 1..8 %}
+        <div class="card-body">
+            <h3 class="card-title h3-responsive">{{ ('legalNotices.title' ~ i) | trans }}</h3>
+            <div class="card-text">{{ ('legalNotices.text' ~ i ) | 
+                            trans({'%webSiteName%': webSiteName,
+                            '%webSiteUrl%': url('index'), 
+                            '%addressContact%': addressContact, 
+                            '%link_start_privacy%' : '<a href="'~path('CGU')~'">',
+                            '%link_start_cgv%' : '<a href="'~path('CGV')~'">', 
+                            '%link_start_contact%' : '<a href="'~path('contact')~'">', 
+                            '%link_start_url%' : '<a href="'~path('index')~'">', 
+                            '%link_end%' : '</a>'
+                            }) 
+                            | raw | nl2br}}
+            </div>
+        </div>
+		{% endfor %}
+
+        <h3 class="card-header h3-responsive text-center">{{ 'confidentiality.subtitle' | trans }}</h3>
+        <div class="card-body">
+            <div class="card-text">{{ 'confidentiality.introduction' | trans }}</div>
+        </div>
+
+		{% for i in 1..12 %}
+        <div class="card-body">
+            <h3 class="card-title h3-responsive">{{ ('confidentiality.title' ~ i) | trans }}</h3>
+            <div class="card-text">{{ ('confidentiality.text' ~ i ) | 
+                            trans({'%webSiteName%': webSiteName,
+                            '%webSiteUrl%': url('index'), 
+                            '%addressContact%': addressContact, 
+                            '%link_start_privacy%' : '<a href="'~path('CGU')~'">',
+                            '%link_start_cgv%' : '<a href="'~path('CGV')~'">', 
+                            '%link_start_contact%' : '<a href="'~path('contact')~'">', 
+                            '%link_start_url%' : '<a href="'~path('index')~'">', 
+                            '%link_end%' : '</a>'
+                            }) 
+                            | raw | nl2br }}
+            </div>
+        </div>
+		{% endfor %}
+	</div>
+{% endblock %}
+
+{% block footer %}
+    {% include 'footer.html.twig' %}
+{% endblock %}
+
+{% block javascripts %}
+    <script nonce="{{ csp_nonce('script') }}" defer src="javascript/mdb/jquery.min.js"></script>
+    <script nonce="{{ csp_nonce('script') }}" defer src="javascript/mdb/mdb.min.js"></script>
+{% endblock %}

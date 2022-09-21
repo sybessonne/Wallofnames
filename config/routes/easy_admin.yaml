@@ -1,0 +1,4 @@
+easy_admin_bundle:
+    resource: 'App\Controller\AdminController'
+    prefix: /admin_F64dfEE0d6fA8F0CEab8970039ccAB
+    type: annotation  

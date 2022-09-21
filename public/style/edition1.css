@@ -1,0 +1,296 @@
+h1
+{
+  text-align: center;
+}
+
+#stepperContainer
+{
+	max-width: none;
+}
+
+#stepperHeader
+{
+  margin: 1% 15% 2% 15%;
+}
+
+.bs-stepper-label
+{
+  color:#000000;
+}
+
+#buttonPart1,  #buttonPart2
+{
+  padding:0.50rem 1.14rem;
+}
+
+.part
+{
+  margin-left: 5%;
+  margin-right: 5%;
+  text-align: center;
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+}
+
+#labelNameField
+{
+  color:#000000;
+  left:15px;
+}
+
+#msgNameField
+{
+  color:#d10e20!important;
+}
+
+#sizesDiv, #textFontDiv, #nameCreation, #bold, #italic
+{
+  margin:auto;
+}
+
+#bold, #italic
+{
+  width:2.5em;
+  height: 2.5em;
+  border-radius: 5em;
+  display: inline-block;
+}
+
+#nameCreation
+{
+  margin-top: 0;
+  margin-bottom: 0;
+ /*position: relative;*/
+}
+
+#nameCreation img 
+{ 
+  position: absolute; 
+  top: 5px; 
+  right: 5px;
+  width: 37px;
+}
+
+#profilePicture {
+  position: relative;
+  display: inline-block;
+
+  width: 45px;
+  color: #fff;
+  text-align: center;
+  border-radius: 50px;
+  padding: 4px 0;
+  
+  position: absolute;
+  z-index: 1;
+}
+
+
+#counter
+{
+  font-size: 0.67em;
+}
+
+.hidden {
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+#colors {
+  -webkit-appearance: none;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 50%;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 2px 2px 5px rgba(0,0,0,.1);
+  border-bottom: transparent !important;
+  margin: auto;
+}
+
+#colors::-webkit-color-swatch-wrapper {
+   padding: 0;
+}
+
+#colors::-webkit-color-swatch {
+   border: none;
+}
+#colors:hover{
+  cursor: pointer;
+}
+
+
+#containerNamesAll
+{
+  margin-bottom: 2%;
+  margin-top:1%;
+}
+
+#containerNames
+{
+	max-height: 800px;
+  /*overflow-y: scroll !important;*/
+}
+
+#mainName
+{
+  opacity: 1;
+  position: absolute;
+  line-height: 1.15;
+  padding: 0.15% 0.5%;
+  cursor: grab;
+  z-index: 5;
+}
+
+#tooltipText
+{
+  font-size: 8pt;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltipText {
+  visibility: hidden;
+  width: 20px;
+  color: #fff;
+  text-align: center;
+  border-radius: 50px;
+  padding: 4px 0;
+  
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltipNo
+{
+  background-color: red;
+}
+
+.tooltipYes
+{
+  background-color: green;
+}
+
+.tooltip:hover .tooltipText  {
+  visibility: visible;
+}
+
+#delays
+{
+  padding-left: 0.5em;
+  display: block;
+  margin: auto;
+  margin-bottom: 3%;
+  text-align: left;
+  width: 20em;
+}
+
+
+#promotionPart
+{
+  margin-bottom: 2%;
+}
+
+#summary
+{
+  margin-bottom: 2%;
+}
+
+#codeInput
+{
+  margin: auto;
+}
+
+#summaryPromotion
+{
+  display: none;
+}
+
+#billingInformation
+{
+  margin:0 auto;
+  width:60%;
+}
+
+#consentCGV
+{
+  line-height: 1.15;
+  font-size: 10pt;
+  width:60%;
+  margin: auto;
+}
+
+.card
+{
+  margin-right: auto;
+  margin-left: auto;
+  width: 60%;
+}
+
+.card-header
+{
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+#cardImg
+{
+  width:80%;
+}
+
+#paypalImg
+{
+  width:65%;
+}
+
+.btnPaymentMethod
+{
+  margin:0;
+  font-size: 1rem;
+  text-transform: none;
+}
+
+.btnPaymentMethod:hover, .btnPaymentMethod:focus
+{
+  text-decoration: none;
+}
+
+#stripeRow
+{
+  display: block;
+}
+
+
+.row
+{
+  flex-wrap: nowrap;
+}
+
+.col-6
+{
+  flex:0 0 35%;
+}
+
+.col-12
+{
+  flex:0 0 65%;
+}
+
+.col, .col-1, .col-12, .col-4, .col-7, .col-9,.col-6
+{
+  padding:0;
+}
+
+.col-7 {
+  flex: 0 0 45%;
+  max-width: 45%;
+}

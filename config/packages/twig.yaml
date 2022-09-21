@@ -1,0 +1,38 @@
+twig:
+    default_path: '%kernel.project_dir%/templates'
+    globals:
+        webSiteName: '%webSite.name%'
+        webSiteUrl: '%webSite.url%'
+        bannerPath: '%variables.bannerPath%'
+        editionPart: '%webSite.part.edition%'
+        receiptsPart: '%webSite.part.receipts%'
+
+        lengthMaxName: '%variables.name.lengthMax%'
+        default: '%variables.default%'
+
+        instagramURL: '%variables.instagramURL%'
+        instagramBaseURL: '%variables.instagramBaseURL%'
+
+        delaiRefreshNamesJS: '%variables.delaiRefreshNamesJS%'
+        defaultColorFirstClick: "%variables.defaultColorFirstClick%"
+        tooltipYes: "%variables.tooltipYes%"
+        tooltipNo: "%variables.tooltipNo%"
+        lengthTextArea: '%variables.lengthTextArea%'
+        regexMainName: '%variables.regexMainName%'
+        regexColor: '%variables.regexColor%'
+        regexSize: '%variables.regexSize%'
+        regexTextFont: '%variables.regexTextFont%'
+
+        imageWidth: '%variables.imageName.width%'
+        imageHeight: '%variables.imageName.height%'
+
+        stripePublicKey: '%payments.stripePublicKey%'
+        paypalClientId: '%payments.paypalClientId%'
+        defaultCurrency: '%payments.defaultCurrency%'
+
+        paymentsService: '@App\Service\Payments'
+
+        addressContact: '%addresses.contact%'
+        links: '%links%'
+
+        nbReasons: "%variables.nbReasons%"
